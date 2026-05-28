@@ -105,8 +105,14 @@ export class VenuesService {
   }
 
   async getFeatured(limit = 12) {
-    return this.venuesRepository.find({
+    const featured = await this.venuesRepository.find({
       where: { is_active: true, is_featured: true },
+      order: { rating: 'DESC' },
+      take: limit,
+    });
+    if (featured.length > 0) return featured;
+    return this.venuesRepository.find({
+      where: { is_active: true },
       order: { rating: 'DESC' },
       take: limit,
     });
