@@ -4,6 +4,8 @@
   "description": "MandapX - Venue Discovery & Management Platform",
   "private": true,
   "scripts": {
+    "build": "cd mandapx-api && npm install && npm run build",
+    "start:prod": "cd mandapx-api && node dist/main",
     "dev:api": "npm run start:dev --prefix mandapx-api",
     "dev:web": "npm run dev --prefix mandapx-web",
     "build:api": "npm run build --prefix mandapx-api",
