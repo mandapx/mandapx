@@ -3,6 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Search, MapPin, Building2 } from "lucide-react";
 
+const HERO_IMAGES = [
+  "/mandapxbanner.png",
+  "/mandapxbanner-02.jpg",
+  "/mandapxbanner-03.jpg",
+];
+
 const CITIES = [
   "Mumbai", "Bangalore", "Delhi NCR", "Chennai", "Hyderabad",
   "Pune", "Ahmedabad", "Kolkata", "Kochi", "Chandigarh",
@@ -28,6 +34,7 @@ const VENUE_TYPES = [
 ];
 
 export default function HeroSection() {
+  const [heroImage] = useState(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]);
   const [city, setCity] = useState("");
   const [locality, setLocality] = useState("");
   const [venueType, setVenueType] = useState("");
@@ -63,7 +70,7 @@ export default function HeroSection() {
     <section className="relative overflow-hidden bg-gray-900">
       <div className="absolute inset-0">
         <img
-          src="/mandapxbanner.png"
+          src={heroImage}
           alt="Wedding venue"
           className="w-full h-full object-cover"
         />
