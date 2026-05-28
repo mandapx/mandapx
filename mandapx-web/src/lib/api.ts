@@ -70,3 +70,26 @@ export async function getFeaturedVenues(limit = 12): Promise<Venue[]> {
 export async function getCities(): Promise<CityCount[]> {
   return fetchAPI('/venues/cities');
 }
+
+export interface InquiryData {
+  venue_slug: string;
+  name: string;
+  email: string;
+  phone: string;
+  event_date?: string;
+  guest_count?: number;
+  message?: string;
+}
+
+export async function submitInquiry(data: InquiryData): Promise<{ id: string }> {
+  const res = await fetch(`${API_BASE}/inquiries`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Inquiry failed: ${res.status}`);
+  }
+  return res.json();
+}
