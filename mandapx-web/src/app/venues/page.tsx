@@ -1,77 +1,74 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import { getVenues } from "@/lib/api";
+import { Venue } from "@/lib/api";
 
 const VENUE_TYPES = ["Banquet Hall", "Hotel", "Resort", "Lawn", "Farmhouse", "Party Hall", "Restaurant", "Club"];
 
-interface PageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+function VenuesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-export default async function VenuesPage({ searchParams }: PageProps) {
-  const sp = await searchParams;
-  const search = typeof sp.search === 'string' ? sp.search : '';
-  const city = typeof sp.city === 'string' ? sp.city : '';
-  const sort = typeof sp.sort === 'string' ? sp.sort : 'rating';
-  const page = typeof sp.page === 'string' ? parseInt(sp.page) || 1 : 1;
-  const type = typeof sp.type === 'string' ? sp.type : '';
+  const search = searchParams.get("search") || "";
+  const city = searchParams.get("city") || "";
+  const sort = searchParams.get("sort") || "rating";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const type = searchParams.get("type") || "";
 
-  let venues: any[] = [];
-  let meta = { total: 0, page: 1, totalPages: 0 };
-  let error = false;
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [meta, setMeta] = useState({ total: 0, page: 1, totalPages: 0 });
+  const [loading, setLoading] = useState(true);
 
-  try {
+  const updateQuery = useCallback((updates: Record<string, string>) => {
+    const p = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([k, v]) => {
+      if (v) p.set(k, v); else p.delete(k);
+    });
+    router.push(`/venues?${p.toString()}`);
+  }, [router, searchParams]);
+
+  useEffect(() => {
+    setLoading(true);
     const params: Record<string, string | number | undefined> = { page, limit: 24, sort };
     if (search) params.search = search;
     if (city) params.city = city;
     if (type) params.venue_type = type;
 
-    const result = await getVenues(params);
-    venues = result.data;
-    meta = result.meta;
-  } catch {
-    error = true;
-  }
+    getVenues(params)
+      .then((result) => { setVenues(result.data); setMeta(result.meta); })
+      .catch(() => { setVenues([]); setMeta({ total: 0, page: 1, totalPages: 0 }); })
+      .finally(() => setLoading(false));
+  }, [search, city, sort, page, type]);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {city ? `Wedding Venues in ${city.charAt(0).toUpperCase() + city.slice(1)}` : 'All Wedding Venues'}
+                {city ? `Wedding Venues in ${city.charAt(0).toUpperCase() + city.slice(1)}` : "All Wedding Venues"}
               </h1>
               <p className="text-sm text-gray-500 mt-1">{meta.total.toLocaleString()} venues found</p>
             </div>
           </div>
 
           <div className="flex gap-4 mb-6 flex-wrap">
-            <form method="GET" className="flex gap-2 flex-1 max-w-md">
+            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); updateQuery({ search: fd.get("search") as string }); }} className="flex gap-2 flex-1 max-w-md">
               <input
-                type="text"
-                name="search"
-                defaultValue={search}
-                placeholder="Search venues..."
+                type="text" name="search" defaultValue={search} placeholder="Search venues..."
                 className="flex-1 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-rani-pink"
               />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-rani-pink text-white text-sm font-bold rounded-lg hover:bg-saffron transition-colors"
-              >
-                Search
-              </button>
+              <button type="submit" className="px-4 py-2 bg-rani-pink text-white text-sm font-bold rounded-lg hover:bg-saffron transition-colors">Search</button>
             </form>
 
             <select
-              name="sort"
-              defaultValue={sort}
-              onChange={e => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('sort', e.target.value);
-                window.location.href = url.toString();
-              }}
+              value={sort}
+              onChange={(e) => updateQuery({ sort: e.target.value, page: "1" })}
               className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm"
             >
               <option value="rating">Top Rated</option>
@@ -83,31 +80,40 @@ export default async function VenuesPage({ searchParams }: PageProps) {
           </div>
 
           <div className="flex flex-wrap gap-2 mb-6">
-            <a
-              href={`/venues?${new URLSearchParams({ ...(search ? { search } : {}), ...(city ? { city } : {}) }).toString()}`}
-              className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors ${!type ? 'bg-rani-pink text-white border-rani-pink' : 'bg-white text-gray-600 border-gray-300 hover:border-rani-pink'}`}
+            <button
+              onClick={() => updateQuery({ type: "", page: "1" })}
+              className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors ${!type ? "bg-rani-pink text-white border-rani-pink" : "bg-white text-gray-600 border-gray-300 hover:border-rani-pink"}`}
             >
               All
-            </a>
-            {VENUE_TYPES.map(t => (
-              <a
+            </button>
+            {VENUE_TYPES.map((t) => (
+              <button
                 key={t}
-                href={`/venues?${new URLSearchParams({ ...(search ? { search } : {}), ...(city ? { city } : {}), type: t }).toString()}`}
-                className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors ${type === t ? 'bg-rani-pink text-white border-rani-pink' : 'bg-white text-gray-600 border-gray-300 hover:border-rani-pink'}`}
+                onClick={() => updateQuery({ type: t, page: "1" })}
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors ${type === t ? "bg-rani-pink text-white border-rani-pink" : "bg-white text-gray-600 border-gray-300 hover:border-rani-pink"}`}
               >
                 {t}
-              </a>
+              </button>
             ))}
           </div>
 
-          {error ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500">Unable to load venues. Make sure the API server is running.</p>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-gray-200 bg-white overflow-hidden animate-pulse">
+                  <div className="aspect-[4/3] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : venues.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-gray-500">No venues found matching your criteria.</p>
-              <a href="/venues" className="text-rani-pink hover:text-saffron font-semibold mt-2 inline-block">Clear filters</a>
+              <button onClick={() => router.push("/venues")} className="text-rani-pink hover:text-saffron font-semibold mt-2 inline-block">Clear filters</button>
             </div>
           ) : (
             <>
@@ -120,37 +126,20 @@ export default async function VenuesPage({ searchParams }: PageProps) {
                   >
                     <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                       {venue.images?.[0] ? (
-                        <img
-                          src={venue.images[0]}
-                          alt={venue.venue_name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          loading="lazy"
-                        />
+                        <img src={venue.images[0]} alt={venue.venue_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                          No image
-                        </div>
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No image</div>
                       )}
                       {venue.rating > 0 && (
-                        <span className="absolute top-2 right-2 bg-mehendi-green text-white text-xs px-2 py-1 rounded font-medium">
-                          ★ {venue.rating}
-                        </span>
+                        <span className="absolute top-2 right-2 bg-mehendi-green text-white text-xs px-2 py-1 rounded font-medium">★ {venue.rating}</span>
                       )}
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-rani-pink transition-colors truncate">
-                        {venue.venue_name}
-                      </h3>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-rani-pink transition-colors truncate">{venue.venue_name}</h3>
                       <p className="text-sm text-gray-500 capitalize mt-1">{venue.city}</p>
                       <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-gray-500">
-                          Up to {venue.capacity_max || 'N/A'} guests
-                        </span>
-                        {venue.cost_per_plate_veg && (
-                          <span className="text-sm font-bold text-gray-900">
-                            ₹{venue.cost_per_plate_veg}
-                          </span>
-                        )}
+                        <span className="text-xs text-gray-500">Up to {venue.capacity_max || "N/A"} guests</span>
+                        {venue.cost_per_plate_veg && <span className="text-sm font-bold text-gray-900">₹{venue.cost_per_plate_veg}</span>}
                       </div>
                     </div>
                   </a>
@@ -160,23 +149,11 @@ export default async function VenuesPage({ searchParams }: PageProps) {
               {meta.totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-12">
                   {page > 1 && (
-                    <a
-                      href={`/venues?${new URLSearchParams({ ...(search ? { search } : {}), ...(city ? { city } : {}), ...(type ? { type } : {}), page: String(page - 1), sort }).toString()}`}
-                      className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm hover:bg-cream"
-                    >
-                      Previous
-                    </a>
+                    <button onClick={() => updateQuery({ page: String(page - 1) })} className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm hover:bg-cream">Previous</button>
                   )}
-                  <span className="text-sm text-gray-600">
-                    Page {page} of {meta.totalPages}
-                  </span>
+                  <span className="text-sm text-gray-600">Page {page} of {meta.totalPages}</span>
                   {page < meta.totalPages && (
-                    <a
-                      href={`/venues?${new URLSearchParams({ ...(search ? { search } : {}), ...(city ? { city } : {}), ...(type ? { type } : {}), page: String(page + 1), sort }).toString()}`}
-                      className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm hover:bg-cream"
-                    >
-                      Next
-                    </a>
+                    <button onClick={() => updateQuery({ page: String(page + 1) })} className="px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm hover:bg-cream">Next</button>
                   )}
                 </div>
               )}
@@ -191,5 +168,35 @@ export default async function VenuesPage({ searchParams }: PageProps) {
         </div>
       </footer>
     </div>
+  );
+}
+
+import { Suspense } from "react";
+
+export default function VenuesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 bg-cream">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-gray-200 bg-white overflow-hidden animate-pulse">
+                  <div className="aspect-[4/3] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    }>
+      <VenuesContent />
+    </Suspense>
   );
 }
