@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import { getVenues } from "@/lib/api";
@@ -170,8 +170,6 @@ function VenuesContent() {
     </div>
   );
 }
-
-import { Suspense } from "react";
 
 export default function VenuesPage() {
   return (
