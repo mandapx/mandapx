@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://www.venuemonk.com/api/search/venues/ahmedabad/wedding-venues/list?page=2"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/venue-service/v1/utility/home/gurgaon/pagedata"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/core-service/search/venues/ahmedabad/base-filters"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/core-service/v1/cities/citylist"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/jasoos-service/pages/save-page"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/jasoos-service/clicks/add-click"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://api-js.mixpanel.com/track/?verbose=1&ip=1&_=1779945860170"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://prod-api.vmnk.in/jasoos-service/clicks/add-custom-event"
+  },
+  {
+    "url": "https://www.venuemonk.com/ahmedabad/wedding-venues",
+    "endpoint": "https://api-js.mixpanel.com/track/?verbose=1&ip=1&_=1779945865661"
+  }
+]

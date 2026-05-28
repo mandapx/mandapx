@@ -1,0 +1,20 @@
+[
+  {
+    "venue_name": "Royal Palace",
+    "address": "SG Highway",
+    "pin_code": "380015",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "capacity": 1200,
+    "cost_per_day": 350000,
+    "images": [
+      "https://example.com/1.jpg"
+    ],
+    "amenities": [
+      "Parking",
+      "AC Hall",
+      "Rooms"
+    ],
+    "source": "WeddingBazaar"
+  }
+]

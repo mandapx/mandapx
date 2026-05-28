@@ -1,0 +1,50 @@
+[
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://get.geojs.io/v1/ip/geo.json",
+    "type": "JSON"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://gorum.auditzy.com/api/rum/beacon",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://gorum.auditzy.com/api/rum/res/beacon",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://gorum.auditzy.com/api/rum/snt",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://mandap-api.mandap.com/api/v1/locations/cities",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://mandap-api.mandap.com/api/v1/locations/cities/ahmedabad",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://mandap-api.mandap.com/api/v1/vendors/paid-locations?city_id=807&category_id=1&limit=3",
+    "type": "REST API"
+  },
+  {
+    "source": "Mandap",
+    "url": "https://www.mandap.com/ahmedabad/wedding-venues",
+    "endpoint": "https://mandap-api.mandap.com/api/v1/vendors?status=1&page=1&limit=24&city_id=807&category_id=1",
+    "type": "REST API"
+  }
+]
