@@ -12,7 +12,15 @@
     "start:web": "npm run start --prefix mandapx-web",
     "import:data": "node learning/database/import-to-pg.js"
   },
-  "keywords": ["wedding", "venue", "booking", "mandapx"],
+  "keywords": [
+    "wedding",
+    "venue",
+    "booking",
+    "mandapx"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.21.0"
+  }
 }
