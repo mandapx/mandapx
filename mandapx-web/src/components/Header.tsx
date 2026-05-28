@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Menu, X, Phone } from "lucide-react";
+import { ChevronDown, Menu, X, Phone, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const CITIES = [
   { name: "Mumbai", slug: "mumbai" },
@@ -34,6 +35,7 @@ const VENUE_TYPES = [
 ];
 
 export default function Header() {
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [citiesOpen, setCitiesOpen] = useState(false);
   const [typesOpen, setTypesOpen] = useState(false);
@@ -140,12 +142,24 @@ export default function Header() {
               <Phone className="w-4 h-4" />
               <span className="font-medium">+91 98250 75783</span>
             </a>
-            <a
-              href="/login"
-              className="px-5 py-2.5 text-sm font-bold text-white bg-rani-pink hover:bg-rani-pink/90 rounded-lg transition-colors shadow-sm"
-            >
-              Sign In
-            </a>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-700">{user.name || user.email}</span>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-red-500 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="px-5 py-2.5 text-sm font-bold text-white bg-rani-pink hover:bg-rani-pink/90 rounded-lg transition-colors shadow-sm"
+              >
+                Sign In
+              </a>
+            )}
           </div>
 
           <button
@@ -193,13 +207,22 @@ export default function Header() {
               >
                 List Your Venue
               </a>
-              <a
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="block text-center px-3 py-3 text-sm font-bold text-white bg-rani-pink rounded-lg"
-              >
-                Sign In
-              </a>
+              {user ? (
+                <button
+                  onClick={() => { logout(); setMobileOpen(false); }}
+                  className="block w-full text-center px-3 py-3 text-sm font-bold text-white bg-gray-600 rounded-lg"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <a
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-center px-3 py-3 text-sm font-bold text-white bg-rani-pink rounded-lg"
+                >
+                  Sign In
+                </a>
+              )}
             </div>
           </div>
         </div>

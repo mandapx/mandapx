@@ -88,6 +88,39 @@ export interface InquiryData {
   message?: string;
 }
 
+export interface AuthResponse {
+  access_token: string;
+  user: { id: string; email: string; role: string };
+}
+
+export async function registerUser(data: { name: string; email: string; password: string; phone?: string }): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Registration failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function loginUser(data: { email: string; password: string }): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Login failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function getMe(token: string): Promise<{ id: string; email: string; role: string; name: string }> {
+  const res = await fetch(`${API_BASE}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error('Session expired');
+  return res.json();
+}
+
 export async function submitInquiry(data: InquiryData): Promise<{ id: string }> {
   const res = await fetch(`${API_BASE}/inquiries`, {
     method: 'POST',
