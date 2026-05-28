@@ -118,6 +118,42 @@ export class VenuesService {
     });
   }
 
+  async findAllAdmin(page = 1, limit = 20, search = '') {
+    const qb = this.venuesRepository.createQueryBuilder('v');
+    if (search) {
+      qb.where('LOWER(v.venue_name) LIKE LOWER(:search) OR LOWER(v.city) LIKE LOWER(:search)', { search: `%${search}%` });
+    }
+    qb.orderBy('v.created_at', 'DESC').skip((page - 1) * limit).take(limit);
+    const [data, total] = await qb.getManyAndCount();
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async updateVenue(id: string, updates: Partial<Venue>) {
+    await this.venuesRepository.update(id, updates);
+    return this.venuesRepository.findOne({ where: { id } });
+  }
+
+  async toggleFeatured(id: string) {
+    const venue = await this.venuesRepository.findOne({ where: { id } });
+    if (!venue) throw new NotFoundException('Venue not found');
+    venue.is_featured = !venue.is_featured;
+    return this.venuesRepository.save(venue);
+  }
+
+  async deleteVenue(id: string) {
+    const venue = await this.venuesRepository.findOne({ where: { id } });
+    if (!venue) throw new NotFoundException('Venue not found');
+    venue.is_active = false;
+    return this.venuesRepository.save(venue);
+  }
+
+  async getVenueStats() {
+    const total = await this.venuesRepository.count();
+    const active = await this.venuesRepository.count({ where: { is_active: true } });
+    const featured = await this.venuesRepository.count({ where: { is_featured: true } });
+    return { total, active, featured };
+  }
+
   async getRandom(limit = 12) {
     return this.venuesRepository
       .createQueryBuilder('v')

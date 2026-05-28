@@ -121,6 +121,65 @@ export async function getMe(token: string): Promise<{ id: string; email: string;
   return res.json();
 }
 
+function authHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("mandapx_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function adminGetStats(): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/stats`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch stats');
+  return res.json();
+}
+
+export async function adminListVenues(page = 1, search = ""): Promise<any> {
+  const qs = new URLSearchParams({ page: String(page), limit: "20" });
+  if (search) qs.set("search", search);
+  const res = await fetch(`${API_BASE}/admin/venues?${qs}`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch venues');
+  return res.json();
+}
+
+export async function adminToggleFeatured(id: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/venues/${id}/featured`, { method: 'PATCH', headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to toggle featured');
+  return res.json();
+}
+
+export async function adminDeleteVenue(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/admin/venues/${id}`, { method: 'DELETE', headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to delete venue');
+}
+
+export async function adminListInquiries(page = 1): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/inquiries?page=${page}&limit=20`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch inquiries');
+  return res.json();
+}
+
+export async function adminUpdateInquiryStatus(id: string, status: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/inquiries/${id}/status`, {
+    method: 'PATCH', headers: { ...authHeaders(), 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Failed to update inquiry');
+  return res.json();
+}
+
+export async function adminListUsers(page = 1): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/users?page=${page}&limit=50`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch users');
+  return res.json();
+}
+
+export async function adminUpdateUserRole(id: string, role: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/admin/users/${id}/role`, {
+    method: 'PATCH', headers: { ...authHeaders(), 'Content-Type': 'application/json' }, body: JSON.stringify({ role }),
+  });
+  if (!res.ok) throw new Error('Failed to update user role');
+  return res.json();
+}
+
 export async function submitInquiry(data: InquiryData): Promise<{ id: string }> {
   const res = await fetch(`${API_BASE}/inquiries`, {
     method: 'POST',

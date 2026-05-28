@@ -5,6 +5,7 @@ import { VenuesModule } from './venues/venues.module';
 import { InquiriesModule } from './inquiries/inquiries.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AdminModule } from './admin/admin.module';
 import { getDatabaseConfig } from './config/database.config';
 
 const useDatabase = !!process.env.DATABASE_URL;
@@ -17,6 +18,7 @@ const useDatabase = !!process.env.DATABASE_URL;
     InquiriesModule,
     AuthModule,
     UsersModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

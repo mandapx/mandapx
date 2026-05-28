@@ -1,8 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
+import { User, UserRole } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +26,29 @@ export class UsersService {
 
   async findById(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async findAll(page = 1, limit = 50) {
+    const [data, total] = await this.usersRepository.findAndCount({
+      order: { created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async updateRole(id: string, role: UserRole) {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException('User not found');
+    user.role = role;
+    return this.usersRepository.save(user);
+  }
+
+  async getUserStats() {
+    const total = await this.usersRepository.count();
+    const admins = await this.usersRepository.count({ where: { role: UserRole.ADMIN } });
+    const owners = await this.usersRepository.count({ where: { role: UserRole.VENUE_OWNER } });
+    return { total, admins, owners };
   }
 
   async validatePassword(password: string, hash: string): Promise<boolean> {

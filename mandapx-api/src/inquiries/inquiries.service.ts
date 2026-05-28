@@ -30,4 +30,17 @@ export class InquiriesService {
     if (!inquiry) throw new NotFoundException('Inquiry not found');
     return inquiry;
   }
+
+  async updateStatus(id: string, status: string) {
+    const inquiry = await this.findOne(id);
+    inquiry.status = status;
+    return this.inquiriesRepository.save(inquiry);
+  }
+
+  async getInquiryStats() {
+    const total = await this.inquiriesRepository.count();
+    const pending = await this.inquiriesRepository.count({ where: { status: 'pending' } });
+    const contacted = await this.inquiriesRepository.count({ where: { status: 'contacted' } });
+    return { total, pending, contacted };
+  }
 }
