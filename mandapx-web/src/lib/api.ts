@@ -44,11 +44,18 @@ interface CityCount {
 }
 
 async function fetchAPI<T>(endpoint: string, revalidate = 3600): Promise<T> {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    next: { revalidate },
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export async function getVenues(params: Record<string, string | number | undefined> = {}): Promise<PaginatedResponse<Venue>> {

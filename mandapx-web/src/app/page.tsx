@@ -111,8 +111,14 @@ async function FeaturedVenues() {
 
   try {
     const base = API_BASE;
-    const res = await fetch(`${base}/venues/featured`, { next: { revalidate: 300 } });
-    if (res.ok) venues = await res.json();
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(`${base}/venues/featured`, { next: { revalidate: 300 }, signal: controller.signal });
+      if (res.ok) venues = await res.json();
+    } finally {
+      clearTimeout(id);
+    }
   } catch {
   }
 
