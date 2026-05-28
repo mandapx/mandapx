@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import { API_BASE } from "@/lib/api";
+import FeaturedVenuesClient from "@/components/FeaturedVenuesClient";
 
 export default function HomePage() {
   return (
@@ -31,7 +31,7 @@ export default function HomePage() {
               </div>
               <a href="/venues" className="text-rani-pink hover:text-saffron font-bold transition-colors">View all →</a>
             </div>
-            <FeaturedVenues />
+            <FeaturedVenuesClient />
           </div>
         </section>
 
@@ -100,73 +100,6 @@ function CityGrid() {
             {city.name}
           </div>
           <div className="text-sm text-gray-500">{city.count} venues</div>
-        </a>
-      ))}
-    </div>
-  );
-}
-
-async function FeaturedVenues() {
-  let venues: any[] = [];
-
-  try {
-    const base = API_BASE;
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 15000);
-    try {
-      const res = await fetch(`${base}/venues/featured`, { next: { revalidate: 300 }, signal: controller.signal });
-      if (res.ok) venues = await res.json();
-    } finally {
-      clearTimeout(id);
-    }
-  } catch {
-  }
-
-  if (venues.length === 0) return null;
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {venues.slice(0, 8).map((venue) => (
-        <a
-          key={venue.id}
-          href={`/venues/${venue.slug}`}
-          className="group rounded-xl border border-gray-200 bg-white overflow-hidden hover:shadow-lg transition-shadow"
-        >
-          <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
-            {venue.images?.[0] ? (
-              <img
-                src={venue.images[0]}
-                alt={venue.venue_name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                No image
-              </div>
-            )}
-            {venue.rating > 0 && (
-              <span className="absolute top-2 right-2 bg-mehendi-green text-white text-xs px-2 py-1 rounded font-medium">
-                ★ {venue.rating}
-              </span>
-            )}
-          </div>
-          <div className="p-4">
-            <h3 className="font-semibold text-gray-900 group-hover:text-rani-pink transition-colors truncate">
-              {venue.venue_name}
-            </h3>
-            <p className="text-sm text-gray-500 capitalize mt-1">{venue.city}</p>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-sm text-gray-600">
-                {venue.venue_type?.[0] || 'Venue'}
-              </span>
-              {venue.cost_per_plate_veg && (
-                <span className="text-sm font-bold text-gray-900">
-                  ₹{venue.cost_per_plate_veg}/plate
-                </span>
-              )}
-            </div>
-          </div>
         </a>
       ))}
     </div>
