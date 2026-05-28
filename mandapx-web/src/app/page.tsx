@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import { API_BASE } from "@/lib/api";
 
 export default function HomePage() {
   return (
@@ -109,7 +110,7 @@ async function FeaturedVenues() {
   let venues: any[] = [];
 
   try {
-    const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+    const base = API_BASE;
     const res = await fetch(`${base}/venues/featured`, { next: { revalidate: 300 } });
     if (res.ok) venues = await res.json();
   } catch {

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mandapx-api
+    env: node
+    rootDir: mandapx-api
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: FRONTEND_URL
+        value: https://mandapx.vercel.app
