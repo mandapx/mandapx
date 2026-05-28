@@ -1,17 +1,10 @@
-import { Controller, Get, Param, Query, Inject } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ListVenuesDto } from './dto/list-venues.dto';
-
-export interface IVenuesService {
-  findAll(query: ListVenuesDto): Promise<any>;
-  findBySlug(slug: string): Promise<any>;
-  getCities(): Promise<any>;
-  getFeatured(limit?: number): Promise<any>;
-  getRandom(limit?: number): Promise<any>;
-}
+import { VenuesService } from './venues.service';
 
 @Controller('venues')
 export class VenuesController {
-  constructor(@Inject('VenuesServiceInterface') private readonly venuesService: IVenuesService) {}
+  constructor(private readonly venuesService: VenuesService) {}
 
   @Get()
   findAll(@Query() query: ListVenuesDto) {
